@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!--接口-->
+<mapper namespace="org.lanqiao.dao.StudentMapper">
+    <!--sql语句:添加-->
+    <insert id="addStu" parameterType="Student">
+        insert  into stu(sname,sage,ssex) values (#{sname},#{sage},#{ssex})
+    </insert>
+    <!--sql语句：查询所有-->
+    <select id="findStu" resultType="Student">
+        select * from stu
+    </select>
+    <!--sql语句：查询所有 返回：Map集-->
+    <select id="findStuMap" resultType="hashmap">
+        select sname from stu where id = 12
+    </select>
+    <!--sql语句：删除-->
+    <delete id="deleteStuById" parameterType="_int">
+        delete from stu where id =#{id}
+    </delete>
+    <!--sql语句：更新-->
+    <update id="updateStuById" parameterType="Student">
+        update stu set sname = #{sname} where id = #{id}
+    </update>
+    <!--sql语句：查询一条-->
+    <select id="findOneStuById" parameterType="int" resultType="Student">
+        select * from stu where id = #{id}
+    </select>
+    <!--：模糊-->
+    <select id="findStuByName" resultType="Student">
+        select * from stu where sname like '%' #{sname} '%'
+    </select>
+    <!--：多条件查询:动态代理-->
+    <select id="findStuByAll" resultType="Student">
+        select * from stu
+        <where>
+            <choose>
+                <when test="arg0 != 0">
+                    AND id = #{arg0}
+                </when>
+                <when test="arg0 != null">
+                    AND sname like '%' #{arg1} '%'
+                </when>
+            </choose>
+        </where>
+    </select>
+    <!--sql片段-->
+    <sql id="baseSql">
+        select * from stu
+    </sql>
+    <!--：多条件查询:动态代理，自定义类型-->
+    <select id="findStudentByInCondition" resultType="Student">
+         /*包含sql片段*/
+        <include refid="baseSql"></include>
+        <where>
+            id in
+            <foreach collection="list" item="student" open="(" separator="," close=")">
+                #{student.id}
+            </foreach>
+        </where>
+    </select>
+</mapper>
